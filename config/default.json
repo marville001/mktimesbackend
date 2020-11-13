@@ -1,0 +1,4 @@
+{
+  "jwtkey": "mktimes",
+  "db": "mongodb+srv://marville001:38125022@cluster0.emkfz.mongodb.net/mktimes?retryWrites=true&w=majority"
+}
