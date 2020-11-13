@@ -1,12 +1,12 @@
 const express = require("express");
 const auth = require("../middleware/auth");
+const { Mail } = require("../models/mails");
 const nodemailer = require("nodemailer");
 const smtpTransport = require("nodemailer-smtp-transport");
-const config = require("config");
 
 const router = express.Router();
 
-router.post("/email", (req, res) => {
+router.post("/email", auth, async (req, res) => {
   try {
     if (!req.files) {
       res.status(400).send({
@@ -24,12 +24,12 @@ router.post("/email", (req, res) => {
 
       var transporter = nodemailer.createTransport(
         smtpTransport({
-          // service: "gmail",
+          service: "gmail",
           host: "smtp.gmail.com",
           port: 465,
           auth: {
-            user: "epaper@mtkenyatimes.co.ke",
-            pass: "Email2020",
+            user: "themtkenyatimes@gmail.com",
+            pass: "kahawasukari",
           },
           tls: {
             rejectUnauthorized: false,
@@ -37,20 +37,26 @@ router.post("/email", (req, res) => {
         })
       );
 
-      var mailOptions = {
-        from: "epaper@mtkenyatimes.co.ke",
-        to: "paulbrian254@gmail.com",
-        subject: "Sending Email using Node.js",
-        text: "That was easy!",
-      };
+      let result = await Mail.find().select("-__v");
+      const emails = result.map((res) => res.email).join(",");
+      console.log("Results : ", result);
+      console.log("Mails : ", emails);
 
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log("Email sent: " + info.response);
-        }
-      });
+      // var mailOptions = {
+      //   from: "themtkenyatimes@gmail.com",
+      //   to: "paulbrian254@gmail.com",
+      //   subject: "Sending Email using Node.js",
+      //   text: "That was easy! LOL!",
+      // };
+
+      // transporter.sendMail(mailOptions, function (error, info) {
+      //   if (error) {
+      //     console.log(error);
+      //     res.status(500).send(error);
+      //   } else {
+      //     res.status(200).send("Email sent: " + info.response);
+      //   }
+      // });
       //send response
       // res.status(200).send({
       //   status: true,
