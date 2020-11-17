@@ -3,8 +3,10 @@ const auth = require("../middleware/auth");
 const { Mail } = require("../models/mails");
 const nodemailer = require("nodemailer");
 const smtpTransport = require("nodemailer-smtp-transport");
-
+const hbs = require("nodemailer-express-handlebars");
+const path = require("path");
 const router = express.Router();
+const moment = require("moment");
 
 router.post("/email", auth, async (req, res) => {
   try {
@@ -18,15 +20,20 @@ router.post("/email", auth, async (req, res) => {
       let link = req.files.link;
       let description = req.files.description;
       let document = req.files.document;
+      let date = moment().format("YYYY-MM-DD");
 
-      image.mv("./uploads/" + image.name);
-      document.mv("./uploads/" + document.name);
+      var rand = Math.floor(Math.random() * 10000 + 1);
+      const imgname = rand + image.name;
+      const docname = rand + document.name;
+
+      image.mv("./uploads/" + imgname);
+      document.mv("./uploads/" + docname);
 
       var transporter = nodemailer.createTransport(
         smtpTransport({
           service: "gmail",
-          host: "smtp.gmail.com",
-          port: 465,
+          // host: "smtp.gmail.com",
+          // port: 465,
           auth: {
             user: "themtkenyatimes@gmail.com",
             pass: "kahawasukari",
@@ -36,40 +43,43 @@ router.post("/email", auth, async (req, res) => {
           },
         })
       );
-
+      transporter.use(
+        "compile",
+        hbs({
+          viewEngine: {
+            extName: ".handlebars",
+            partialsDir: path.resolve(__dirname, "../views"),
+            defaultLayout: false,
+          },
+          viewPath: path.resolve(__dirname, "../views"),
+          extName: ".handlebars",
+        })
+      );
       let result = await Mail.find().select("-__v");
       const emails = result.map((res) => res.email).join(",");
-      console.log("Results : ", result);
-      console.log("Mails : ", emails);
 
-      // var mailOptions = {
-      //   from: "themtkenyatimes@gmail.com",
-      //   to: "paulbrian254@gmail.com",
-      //   subject: "Sending Email using Node.js",
-      //   text: "That was easy! LOL!",
-      // };
+      var mailOptions = {
+        from: "themtkenyatimes@gmail.com",
+        to: emails,
+        subject: "Sending Email using Node.js",
+        template: "main",
+        context: {
+          image: "http://localhost:5000/static" + imgname,
+          link,
+          description,
+          document: "http://localhost:5000/static" + docname,
+          date,
+        },
+      };
 
-      // transporter.sendMail(mailOptions, function (error, info) {
-      //   if (error) {
-      //     console.log(error);
-      //     res.status(500).send(error);
-      //   } else {
-      //     res.status(200).send("Email sent: " + info.response);
-      //   }
-      // });
-      //send response
-      // res.status(200).send({
-      //   status: true,
-      //   message: "File is uploaded",
-      //   data: {
-      //     image: image.name,
-      //     imagemimetype: image.mimetype,
-      //     imagesize: image.size,
-      //     document: document.name,
-      //     documentmimetype: document.mimetype,
-      //     documentsize: document.size,
-      //   },
-      // });
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+          res.status(500).send({ error: error });
+        } else {
+          res.status(200).send("Email sent: Check your email box for details");
+        }
+      });
     }
   } catch (err) {
     res.status(500).send(err);

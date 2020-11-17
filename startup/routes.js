@@ -16,7 +16,7 @@ module.exports = function (app) {
   app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
   app.use(bodyParser.json({ limit: "30mb", extended: true }));
   app.use(cors());
-  app.use("/public", express.static(path.join(__dirname, "public")));
+  app.use("/static", express.static(path.join(__dirname, "uploads")));
 
   app.engine("handlebars", exphbs());
   app.set("view engine", "handlebars");
