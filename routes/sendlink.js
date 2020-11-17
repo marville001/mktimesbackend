@@ -64,10 +64,10 @@ router.post("/email", auth, async (req, res) => {
         subject: "Sending Email using Node.js",
         template: "main",
         context: {
-          image: "http://localhost:5000/static" + imgname,
+          image: "https://mktimes-backend.herokuapp.com/static" + imgname,
           link,
           description,
-          document: "http://localhost:5000/static" + docname,
+          document: "https://mktimes-backend.herokuapp.com/static" + docname,
           date,
         },
       };
