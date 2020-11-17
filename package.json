@@ -23,6 +23,7 @@
     "moment": "^2.29.1",
     "mongoose": "^5.10.13",
     "nodemailer": "^6.4.16",
+    "nodemailer-express-handlebars": "^4.0.0",
     "nodemailer-smtp-transport": "^2.7.4",
     "nodemon": "^2.0.6",
     "winston": "^3.3.3"
