@@ -61,23 +61,28 @@ router.post("/email", auth, async (req, res) => {
       var mailOptions = {
         from: "themtkenyatimes@gmail.com",
         to: emails,
-        subject: "Sending Email using Node.js",
+        subject: "Mt Kenya times Article and Magazine Update",
         template: "main",
         context: {
-          image: "https://mktimes-backend.herokuapp.com/static" + imgname,
+          image: "https://mktimes-backend.herokuapp.com/static/" + imgname,
           link,
           description,
-          document: "https://mktimes-backend.herokuapp.com/static" + docname,
+          document: "https://mktimes-backend.herokuapp.com/static/" + docname,
           date,
         },
       };
 
+      console.log(mailOptions.context);
+
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
           console.log(error);
-          res.status(500).send({ error: error });
+          res.status(500).send({ success: false, error: error });
         } else {
-          res.status(200).send("Email sent: Check your email box for details");
+          res.status(200).send({
+            success: true,
+            message: "Email sent ",
+          });
         }
       });
     }
