@@ -26,15 +26,12 @@ router.post("/email", auth, async (req, res) => {
       const imgname = rand + image.name;
       const docname = rand + document.name;
 
-      image.mv("./uploads/" + imgname);
-      document.mv("./uploads/" + docname);
+      image.mv("./public/" + imgname);
+      document.mv("./public/" + docname);
 
       var transporter = nodemailer.createTransport(
         smtpTransport({
           service: "gmail",
-          host: "smtp.gmail.com",
-          port: 465,
-          secure: true,
           auth: {
             user: "themtkenyatimes@gmail.com",
             pass: "kahawasukari",
@@ -62,7 +59,7 @@ router.post("/email", auth, async (req, res) => {
       var mailOptions = {
         from: "themtkenyatimes@gmail.com",
         to: emails,
-        subject: "Mt Kenya times Article and Magazine Update",
+        subject: "Mt Ke",
         template: "main",
         context: {
           image: "https://mktimes-backend.herokuapp.com/static/" + imgname,
@@ -72,8 +69,6 @@ router.post("/email", auth, async (req, res) => {
           date,
         },
       };
-
-      console.log(mailOptions.context);
 
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
